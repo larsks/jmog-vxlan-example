@@ -1,0 +1,62 @@
+metadata:
+  description: A vxlan-based overlay networks
+
+networks:
+  transit:
+    cidr: 192.168.4.0/24
+  lan1:
+    cidr: 192.168.3.0/24
+  lan2:
+    cidr: 192.168.3.0/24
+
+hosts:
+  lan1host1:
+    interfaces:
+    - network: lan1
+      autoip: false
+    startup: |
+      ip addr add 192.168.3.1/24 dev eth0
+  lan2host1:
+    interfaces:
+    - network: lan2
+      autoip: false
+    startup: |
+      ip addr add 192.168.3.4/24 dev eth0
+  server1:
+    autogateway: false
+    interfaces:
+    - network: transit
+      address: 192.168.4.1
+    - network: lan1
+      autoip: false
+    startup: |
+      ip link add br-vxlan10 type bridge
+      ip addr add 192.168.3.2/24 dev br-vxlan10
+      ip link set br-vxlan10 up
+
+      ip link set master br-vxlan10 dev eth1
+      ip link set eth1 up
+
+      ip link add vxlan10 type vxlan id 10 \
+        local 192.168.4.1 remote 192.168.4.2 dstport 4789
+      ip link set master br-vxlan10 dev vxlan10
+      ip link set vxlan10 up
+  server2:
+    autogateway: false
+    interfaces:
+    - network: transit
+      address: 192.168.4.2
+    - network: lan2
+      autoip: false
+    startup: |
+      ip link add br-vxlan10 type bridge
+      ip addr add 192.168.3.3/24 dev br-vxlan10
+      ip link set br-vxlan10 up
+
+      ip link set master br-vxlan10 dev eth1
+      ip link set eth1 up
+
+      ip link add vxlan10 type vxlan id 10 \
+        local 192.168.4.2 remote 192.168.4.1 dstport 4789
+      ip link set master br-vxlan10 dev vxlan10
+      ip link set vxlan10 up

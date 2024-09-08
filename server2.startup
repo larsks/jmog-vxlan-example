@@ -1,0 +1,16 @@
+# connect device eth0 to network "transit"
+ip addr add 192.168.4.2/24 dev eth0
+
+# host startup commands
+ip link add br-vxlan10 type bridge
+ip addr add 192.168.3.3/24 dev br-vxlan10
+ip link set br-vxlan10 up
+
+ip link set master br-vxlan10 dev eth1
+ip link set eth1 up
+
+ip link add vxlan10 type vxlan id 10 \
+  local 192.168.4.2 remote 192.168.4.1 dstport 4789
+ip link set master br-vxlan10 dev vxlan10
+ip link set vxlan10 up
+

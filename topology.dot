@@ -1,0 +1,15 @@
+strict graph  {
+transit;
+lan1;
+lan2;
+lan1host1 [shape=box];
+lan2host1 [shape=box];
+server1 [shape=box];
+server2 [shape=box];
+transit -- server1;
+transit -- server2;
+lan1 -- lan1host1;
+lan1 -- server1;
+lan2 -- lan2host1;
+lan2 -- server2;
+}

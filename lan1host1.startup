@@ -1,0 +1,7 @@
+
+# routes
+ip route add default via 192.168.3.1
+
+# host startup commands
+ip addr add 192.168.3.1/24 dev eth0
+
